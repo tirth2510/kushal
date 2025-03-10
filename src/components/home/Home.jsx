@@ -57,8 +57,19 @@ const Home = () => {
                 await setDoc(userDocRef, { queries: existingPrompts }, { merge: true });
     
                 console.log("✅ Prompt stored successfully:", query);
-                toast.success("Prompt stored successfully in the database!");
-                alert("✅ Prompt stored successfully in the database!"); // ✅ Show alert to user
+                
+                // ✅ Show only the toast notification (remove default alert)
+                toast.success("Prompt stored successfully in the database!", {
+                    position: "top-center",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    icon: "✅"
+                });
             } else {
                 console.log("ℹ️ Prompt already exists:", query);
             }
@@ -67,6 +78,7 @@ const Home = () => {
             toast.error("Failed to store prompt. Try again.");
         }
     };
+    
     
 
     // Function to generate images and store prompt
