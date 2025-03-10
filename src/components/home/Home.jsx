@@ -42,20 +42,23 @@ const Home = () => {
             console.log("❌ User is not logged in.");
             return;
         }
-
+    
         try {
             const userDocRef = doc(db, "prompts", currentUser.email);
             const userDoc = await getDoc(userDocRef);
             let existingPrompts = [];
-
+    
             if (userDoc.exists()) {
                 existingPrompts = userDoc.data().queries || [];
             }
-
+    
             if (!existingPrompts.includes(query)) {
                 existingPrompts.push(query);
                 await setDoc(userDocRef, { queries: existingPrompts }, { merge: true });
-                console.log("✅ Prompt saved:", query);
+    
+                console.log("✅ Prompt stored successfully:", query);
+                toast.success("Prompt stored successfully in the database!");
+                alert("✅ Prompt stored successfully in the database!"); // ✅ Show alert to user
             } else {
                 console.log("ℹ️ Prompt already exists:", query);
             }
@@ -64,6 +67,7 @@ const Home = () => {
             toast.error("Failed to store prompt. Try again.");
         }
     };
+    
 
     // Function to generate images and store prompt
     const imageGenerator = async () => {
