@@ -1,8 +1,10 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import {getAuth} from "firebase/auth";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore"; // ✅ Import Firestore
 
+// ✅ Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAGz1GzMzoCKWyfle9hEDidmyT5lJj-ll0",
   authDomain: "graphical-password-ea1ba.firebaseapp.com",
@@ -13,8 +15,25 @@ const firebaseConfig = {
   measurementId: "G-VB3YD9Y0MY"
 };
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
+// ✅ Prevent duplicate Firebase initialization
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-export {app,auth};
+// ✅ Ensure Analytics runs only in the browser
+let analytics;
+if (typeof window !== "undefined") {
+  analytics = getAnalytics(app);
+}
+
+// ✅ Initialize Firebase Authentication and Firestore
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ✅ Ensure auth is defined before exporting
+if (!auth) {
+  console.error("❌ Firebase Auth initialization failed!");
+} else {
+  console.log("✅ Firebase Auth initialized successfully!");
+}
+
+// ✅ Export Firebase services
+export { app, auth, analytics, db };

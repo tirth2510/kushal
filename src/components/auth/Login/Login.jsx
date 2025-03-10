@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Navigate, Link, useNavigate } from 'react-router-dom';
-import { doSignInWithEmailAndPassword, doSignInWithGoogle } from "C:/Users/tirth/OneDrive/Desktop/LYgraphy/src/firebase/auth";
-import { useAuth } from "C:/Users/tirth/OneDrive/Desktop/LYgraphy/src/contexts/authcontexts";
+import { doSignInWithEmailAndPassword, doSignInWithGoogle } from "C:/Users/tirth/OneDrive/Desktop/kushal/src/firebase/auth";
+import { useAuth } from "C:/Users/tirth/OneDrive/Desktop/kushal/src/contexts/authcontexts";
 import { toast, ToastContainer } from 'react-toastify';  // Import react-toastify
 import 'react-toastify/dist/ReactToastify.css';  // Import the CSS
 import './login.css';

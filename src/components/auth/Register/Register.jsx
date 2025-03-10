@@ -106,8 +106,8 @@
 
 import { useState } from "react";
 import { Navigate, Link, useNavigate } from "react-router-dom";
-import { useAuth } from "C:/Users/tirth/OneDrive/Desktop/LYgraphy/src/contexts/authcontexts";
-import { doCreateUserWithEmailAndPassword } from "C:/Users/tirth/OneDrive/Desktop/LYgraphy/src/firebase/auth";
+import { useAuth } from "C:/Users/tirth/OneDrive/Desktop/kushal/src/contexts/authcontexts";
+import { doCreateUserWithEmailAndPassword } from "C:/Users/tirth/OneDrive/Desktop/kushal/src/firebase/auth";
 import "./register.css"; // Import the new CSS file
 import Header from "../../header/Header";
 
