@@ -14,9 +14,9 @@ const Home = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [images, setImages] = useState([]);
-
+    
     const UNSPLASH_ACCESS_KEY = 'FNxL47px-8y7SqgCmvjzVcz-73aUWYoleL3L9xg9h7s'; // Replace with your Unsplash Access Key
-    const defaultPrompt = "green grass"; // ✅ Set predefined prompt
+    const defaultPrompt = "nature landscape"; // ✅ Set predefined prompt
 
     useEffect(() => {
         if (location.state?.successMessage) {
@@ -35,7 +35,7 @@ const Home = () => {
         }
 
         // ✅ Automatically trigger image generation on page load
-        imageGenerator(defaultPrompt);
+        generateImages();
     }, [location, navigate]);
 
     // Function to store prompt in Firestore
@@ -80,32 +80,56 @@ const Home = () => {
         }
     };
 
-    // Function to generate images and store prompt
-    const imageGenerator = async (query) => {
-        if (!query) {
-            toast.warn("Prompt is empty!");
-            return;
-        }
-
-        // Store the prompt in Firestore
-        await storePromptInFirestore(query);
-
+    // Function to generate one default prompt image + 11 random images, placing prompt image at random index
+    const generateImages = async () => {
         try {
-            console.log("🔍 Fetching images for:", query);
-            const response = await fetch(
-                `https://api.unsplash.com/search/photos?query=${query}&per_page=12`,
+            console.log("🔍 Fetching default image for:", defaultPrompt);
+            
+            // Fetch images for the predefined prompt
+            const promptResponse = await fetch(
+                `https://api.unsplash.com/search/photos?query=${defaultPrompt}&per_page=12`,
                 {
                     headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` },
                 }
             );
 
-            if (!response.ok) throw new Error("Failed to fetch images.");
+            if (!promptResponse.ok) throw new Error("Failed to fetch default images.");
 
-            const data = await response.json();
-            if (data.results.length === 0) {
-                toast.warn("No images found for this query.");
+            const promptData = await promptResponse.json();
+            if (promptData.results.length === 0) {
+                toast.warn("No images found for the default prompt.");
+                return;
             }
-            setImages(data.results.map(image => image.urls.small));
+
+            // Select one image from the prompt results
+            const selectedPromptImage = promptData.results[0].urls.small;
+
+            console.log("✅ Selected prompt image:", selectedPromptImage);
+
+            // Fetch 11 completely random images (not related to prompt)
+            console.log("🔍 Fetching 11 random images...");
+            const randomResponse = await fetch(
+                `https://api.unsplash.com/photos/random?count=11`,
+                {
+                    headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` },
+                }
+            );
+
+            if (!randomResponse.ok) throw new Error("Failed to fetch random images.");
+
+            const randomData = await randomResponse.json();
+            let randomImages = randomData.map(image => image.urls.small);
+
+            console.log("✅ Random images fetched:", randomImages);
+
+            // Insert the prompt image at a random index
+            const randomIndex = Math.floor(Math.random() * 12); // Generate random index between 0-11
+            randomImages.splice(randomIndex, 0, selectedPromptImage);
+
+            console.log(`✅ Inserted prompt image at index ${randomIndex}`);
+
+            // Update state with shuffled images
+            setImages(randomImages);
         } catch (error) {
             console.error("❌ Error fetching images:", error);
             toast.error("Error fetching images. Try again later.");
