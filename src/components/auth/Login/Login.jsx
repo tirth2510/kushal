@@ -2,56 +2,52 @@ import { useState } from 'react'
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { doSignInWithEmailAndPassword, doSignInWithGoogle } from "C:/Users/tirth/OneDrive/Desktop/kushal/src/firebase/auth";
 import { useAuth } from "C:/Users/tirth/OneDrive/Desktop/kushal/src/contexts/authcontexts";
-import { toast, ToastContainer } from 'react-toastify';  // Import react-toastify
-import 'react-toastify/dist/ReactToastify.css';  // Import the CSS
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './login.css';
 import Header from '../../header/Header';
 import { getAuth } from "firebase/auth";
 
 const Login = () => {
     const { userLoggedIn } = useAuth();
-    const navigate = useNavigate();  // Hook to navigate programmatically
+    const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isSigningIn, setIsSigningIn] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        if (!isSigningIn) {
+            setIsSigningIn(true);
+            try {
+                const auth = getAuth();
+                const userCredential = await doSignInWithEmailAndPassword(email, password);
 
-const onSubmit = async (e) => {
-    e.preventDefault();
-    if (!isSigningIn) {
-        setIsSigningIn(true);
-        try {
-            const auth = getAuth();
-            const userCredential = await doSignInWithEmailAndPassword(email, password);
+                if (!userCredential.user.emailVerified) {
+                    toast.error("Please verify your email before logging in.");
+                    setIsSigningIn(false);
+                    return;
+                }
 
-            // Check if user is verified
-            if (!userCredential.user.emailVerified) {
-                toast.error("Please verify your email before logging in.");
+                navigate('/home', { state: { successMessage: "Login Successful" } });
+            } catch (error) {
+                setErrorMessage('Credentials are incorrect.');
+                toast.error('Credentials are Incorrect', {
+                    position: "top-center",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark"
+                });
                 setIsSigningIn(false);
-                return;
             }
-
-            navigate('/home', { state: { successMessage: "Login Successful" } });
-        } catch (error) {
-            setErrorMessage('Credentials are incorrect.');
-            toast.error('Credentials are Incorrect', {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark"
-            });
-            setIsSigningIn(false);
         }
-    }
-};
-
+    };
 
     const onGoogleSignIn = (e) => {
         e.preventDefault();
@@ -66,12 +62,16 @@ const onSubmit = async (e) => {
         }
     };
 
+    // Function to navigate to email.jsx
+    const goToEmailPage = () => {
+        navigate('/email');
+    };
+
     return (
         <div>
-            <Header></Header>
+            <Header />
             {userLoggedIn && (<Navigate to={'/home'} replace={true} />)}
-            
-            {/* Toast container for notifications */}
+
             <ToastContainer />
 
             <main className="login-container">
@@ -120,7 +120,7 @@ const onSubmit = async (e) => {
                     </form>
 
                     <p style={{ textAlign: 'center', marginTop: '10px' }}>Don't have an account? <Link to={'/register'}>Sign up</Link></p>
-                    <br></br>
+                    <br />
 
                     <div style={{ textAlign: 'center', fontWeight: 'bold' }}>OR</div>
 
@@ -140,6 +140,12 @@ const onSubmit = async (e) => {
                         </svg>
                         {isSigningIn ? 'Continuing with Google...' : 'Continue with Google'}
                     </button>
+
+                    {/* New Button to Redirect to Email Page */}
+                    <button onClick={goToEmailPage} className="email-page-btn">
+                        Go to Email Page
+                    </button>
+
                 </div>
             </main>
         </div>

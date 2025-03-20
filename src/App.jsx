@@ -1,12 +1,12 @@
 import { BrowserRouter as Router } from 'react-router-dom';
+import { useRoutes } from "react-router-dom";
 import Login from "./components/auth/Login/Login";
 import Register from "./components/auth/Register/Register";
 import Home from "./components/home/Home";
-import { AuthProvider } from "./contexts/authcontexts";
-import { useRoutes } from "react-router-dom";
-import Header from './components/header/Header';
+import Email from "./components/email/Email"; // Import the Email page
 import Start from './components/intro/Start';
-import './App.css';  // Your global styles
+import { AuthProvider } from "./contexts/authcontexts";
+import './App.css';  // Global styles
 import 'tailwindcss/tailwind.css';  // Assuming Tailwind is correctly set up
 
 function AppRoutes() {
@@ -28,19 +28,22 @@ function AppRoutes() {
       element: <Home />,
     },
     {
+      path: "/email",  // New route for Email page
+      element: <Email />,
+    },
+    {
       path: "*", 
-      element: <div>404 - Page not found</div>, // Catch-all for undefined routes
+      element: <div className="text-center mt-10 text-2xl font-bold">404 - Page Not Found</div>, // Catch-all for undefined routes
     },
   ];
-  let routesElement = useRoutes(routesArray);
-  return routesElement;
+  
+  return useRoutes(routesArray);
 }
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        {/* <Header /> */}
         <div className="w-full h-screen flex flex-col">
           <AppRoutes />
         </div>

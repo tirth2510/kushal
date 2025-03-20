@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from "../header/Header";
 import { useAuth } from "C:/Users/tirth/OneDrive/Desktop/kushal/src/contexts/authcontexts/index";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -14,9 +14,9 @@ const Home = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [images, setImages] = useState([]);
-    let inputRef = useRef(null);
 
     const UNSPLASH_ACCESS_KEY = 'FNxL47px-8y7SqgCmvjzVcz-73aUWYoleL3L9xg9h7s'; // Replace with your Unsplash Access Key
+    const defaultPrompt = "green grass"; // ✅ Set predefined prompt
 
     useEffect(() => {
         if (location.state?.successMessage) {
@@ -33,6 +33,9 @@ const Home = () => {
 
             navigate(location.pathname, { replace: true, state: {} });
         }
+
+        // ✅ Automatically trigger image generation on page load
+        imageGenerator(defaultPrompt);
     }, [location, navigate]);
 
     // Function to store prompt in Firestore
@@ -57,8 +60,6 @@ const Home = () => {
                 await setDoc(userDocRef, { queries: existingPrompts }, { merge: true });
     
                 console.log("✅ Prompt stored successfully:", query);
-                
-                // ✅ Show only the toast notification (remove default alert)
                 toast.success("Prompt stored successfully in the database!", {
                     position: "top-center",
                     autoClose: 3000,
@@ -78,15 +79,11 @@ const Home = () => {
             toast.error("Failed to store prompt. Try again.");
         }
     };
-    
-    
 
     // Function to generate images and store prompt
-    const imageGenerator = async () => {
-        const query = inputRef.current.value.trim().split(' ').slice(0, 5).join(' ');
-
+    const imageGenerator = async (query) => {
         if (!query) {
-            toast.warn("Please enter a prompt!");
+            toast.warn("Prompt is empty!");
             return;
         }
 
@@ -119,8 +116,8 @@ const Home = () => {
         <div className='ai-image-generator'>
             <Header />
             <ToastContainer />
-            <div className="header">AI Image <span className='aiwala'>Generator</span> </div>
-            
+            <div className="header">AI Image <span className='aiwala'>Generator</span></div>
+
             <div className="img-loading">
                 <div className="images-grid">
                     {images.length > 0 ? (
@@ -135,11 +132,6 @@ const Home = () => {
                         </div>
                     )}
                 </div>
-            </div>
-            
-            <div className="search-box">
-                <input type="text" ref={inputRef} className='search-input' placeholder='Enter up to 5 words' />
-                <div className="generate-btn" onClick={imageGenerator}>Generate</div>
             </div>
         </div>
     );
